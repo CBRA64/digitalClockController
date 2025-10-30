@@ -1,2 +1,2 @@
 # digitalClockController
-Control program for a digital clock.
+Control program for a digital clock made with arduino script.
