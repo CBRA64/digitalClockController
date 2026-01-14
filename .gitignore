@@ -42,3 +42,7 @@
 
 # Build / compiled files
 build
+
+# temporal files
+*.temp
+*.old
