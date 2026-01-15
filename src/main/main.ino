@@ -16,6 +16,8 @@
 */
 
 #include "chained_74hc595.h"
+#include "RTClib.h"
+#include "DHT.h"
 
 /*
   --------------------------------------------------------------------------
@@ -23,22 +25,37 @@
   --------------------------------------------------------------------------
 */  
 
-// Shift registers chains
-uint8_t
-  CHAIN_A_N_SR_CLR = 12,  // ICC N_SR_CLR pin 10  // Unclears Seial
+// Pinout declarations
+const uint8_t
+  CHAIN_A_N_SR_CLR = 12,  // ICC N_SR_CLR pin 10  // Unclears Serial
   CHAIN_A_SR_CLK = 11,    // ICC SR_CLK pin 11    // Reads Serial
   CHAIN_A_R_CLK = 10,     // ICC R_CLK pin 12     // Shifts Serial
   CHAIN_A_N_OE = 9,       // ICC N_OE pin 13      // Disables Output
   CHAIN_A_SER = 8,        // ICC SER pin 14       // Data Serial
   
-  CHAIN_B_N_SR_CLR = 7,   // ICC N_SR_CLR pin 10  // Unclears Seial
+  CHAIN_B_N_SR_CLR = 7,   // ICC N_SR_CLR pin 10  // Unclears Serial
   CHAIN_B_SR_CLK = 6,     // ICC SR_CLK pin 11    // Reads Serial
   CHAIN_B_R_CLK = 5,      // ICC R_CLK pin 12     // Shifts Serial
   CHAIN_B_N_OE = 4,       // ICC N_OE pin 13      // Disables Output
   CHAIN_B_SER = 3,        // ICC SER pin 14       // Data Serial
-  
-  CHAIN_A_LED = 02
+
+  PIN_LED = 13,           // On-board LED pin
+
+  PIN_DHT = 2             // Digital pin connected to the DHT sensor
 ;
+
+// DHT Sensor type
+#define DHTTYPE DHT11     // DHT 11
+
+// Time control constants
+unsigned long
+  SECOND_MS = 1000,               // 1s
+  TIME_DURATION_MS = 4000,        // 4s
+  TEMPERATURE_DURATION_MS = 1000, // 1s
+  RESYNC_LAPSE_MS = 120000        // 2h
+;
+
+
 
 
 /*
@@ -51,6 +68,8 @@ uint16_t
   delay_time_ser_us = 20,
   delay_time_out = 1000/2
 ;
+
+int16_t year, month, day, hour, minute, second; 
 
 /*
   --------------------------------------------------------------------------
@@ -68,6 +87,10 @@ chainB(
   CHAIN_B_R_CLK, CHAIN_B_N_SR_CLR, 
   CHAIN_B_N_OE
 );
+
+RTC_DS1307 rtc;
+
+DHT dht(DHTPIN, DHTTYPE);
 
 /*
   --------------------------------------------------------------------------
