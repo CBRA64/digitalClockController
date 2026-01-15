@@ -1,0 +1,81 @@
+#include "RTClib.h"
+#include "DHT.h"
+
+#define DHTPIN 2     // Digital pin connected to the DHT sensor
+#define DHTTYPE DHT11   // DHT 11
+
+RTC_DS1307 rtc;
+DHT dht(DHTPIN, DHTTYPE);
+
+int16_t year, month, day, hour, minute, second; 
+
+void setup () {
+  Serial.begin(115200);
+
+  if (! rtc.begin()) {
+    Serial.println("Couldn't find RTC");
+    Serial.flush();
+    while (1) delay(10);
+  }
+  DateTime now = rtc.now();
+
+  year = now.year();
+  month = now.month();
+  day = now.day();
+  hour = now.hour();
+  minute = now.minute();
+  second = now.second()-4;
+  dht.begin();
+}
+
+String timestamp;
+
+void loop() {
+  second++;
+  second++;
+  if (second >= 60){
+    second -= 60;
+    minute++;
+    if (minute >= 60){
+      minute = 0;
+      hour++;
+      if (hour >= 24){
+        hour = 0;
+        day++;
+        if (day >= 24){
+          day = 0;
+          month++;
+          if (month >= 24){
+            month = 0;
+            year++;
+          }
+        }
+      }
+    }
+  }
+  Serial.print(year);
+  Serial.print("-");
+  Serial.print(month/10);
+  Serial.print(month%10);
+  Serial.print("-");
+  Serial.print(day/10);
+  Serial.print(day%10);
+  Serial.print("\t");
+  Serial.print(hour/10);
+  Serial.print(hour%10);
+  Serial.print(":");
+  Serial.print(minute/10);
+  Serial.print(minute%10);
+  Serial.print(":");
+  Serial.print(second/10);
+  Serial.println(second%10);
+  float t = dht.readTemperature();
+  if (isnan(t)){
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+  Serial.print(F("Temperature: "));
+  Serial.print(t);
+  Serial.println(F("°C"));
+  delay(2000-36);
+}

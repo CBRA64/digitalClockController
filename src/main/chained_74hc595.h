@@ -97,16 +97,16 @@ Chained74HC595::Chained74HC595(
   uint8_t SR_CLK, uint8_t SER, uint8_t R_CLK,
   uint8_t N_SR_CLR, uint8_t N_OE
 ){
+  // Defines N_OE and disables output on shiftregisters.
+  pinMode(N_OE, OUTPUT);
+  digitalWrite(N_OE, HIGH);
+
   // Define the pins to use for each instance.
   this->SR_CLK = SR_CLK;
   this->SER = SER;
   this->R_CLK = R_CLK;
   this->N_SR_CLR = N_SR_CLR;
   this->N_OE = N_OE;
-
-  // Defines N_OE and disables output on shiftregisters.
-  pinMode(this->N_OE, OUTPUT);
-  digitalWrite(this->N_OE, HIGH);
 
   // Defines SR_CLR and clears data on shiftregister.
   pinMode(this->N_SR_CLR, OUTPUT);

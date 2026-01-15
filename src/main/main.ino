@@ -98,6 +98,11 @@ DHT dht(DHTPIN, DHTTYPE);
   --------------------------------------------------------------------------
 */  
 
+void getTime(void);
+bool getTemperature(void);
+void tickTime(void);
+void setup(void);
+void loop(void);
 
 /*
   --------------------------------------------------------------------------
@@ -105,9 +110,34 @@ DHT dht(DHTPIN, DHTTYPE);
   --------------------------------------------------------------------------
 */  
 
+void getTime(void){
+  DateTime now = rtc.now();
+
+  year = now.year();
+  month = now.month();
+  day = now.day();
+  hour = now.hour();
+  minute = now.minute();
+  second = now.second()-4;
+}
+
 void setup(){
   chainA.disableOutput();
+  chainB.disableOutput();
   pinMode(LED, OUTPUT);
+
+  Serial.begin(115200);
+
+  if (! rtc.begin()) {
+    Serial.println("Couldn't find RTC");
+    Serial.flush();
+    while (1) delay(10);
+  }
+
+  getTime();
+  dht.begin();
+
+
 }
 
 void loop(){
@@ -121,12 +151,12 @@ void loop(){
   //   delay(delay_time_out);
 
   // }
-  chainA.disableOutput();
-  chainA.byteShift(display_bits[display_empty]);
-  chainA.enableOutput();
-  delay(2000);
-  chainA.disableOutput();
-  chainA.byteShift(display_bits[display_full]);
-  chainA.enableOutput();
+  // chainA.disableOutput();
+  // chainA.byteShift(display_bits[display_empty]);
+  // chainA.enableOutput();
+  // delay(2000);
+  // chainA.disableOutput();
+  // chainA.byteShift(display_bits[display_full]);
+  // chainA.enableOutput();
   delay(2000);
 }
