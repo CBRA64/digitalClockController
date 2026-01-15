@@ -24,22 +24,22 @@
 // Global Constants
 // --------------------------------------------------------------------------
 
-#define display_full 13
-#define display_empty 12
-#define display_dash 11
-#define display_C 10
-#define display_9 9
-#define display_8 8
-#define display_7 7
-#define display_6 6
-#define display_5 5
-#define display_4 4
-#define display_3 3
-#define display_2 2
-#define display_1 1
-#define display_0 0
+#define DISPLAY_FULL 13
+#define DISPLAY_EMPTY 12
+#define DISPLAY_DASH 11
+#define DISPLAY_C 10
+#define DISPLAY_9 9
+#define DISPLAY_8 8
+#define DISPLAY_7 7
+#define DISPLAY_6 6
+#define DISPLAY_5 5
+#define DISPLAY_4 4
+#define DISPLAY_3 3
+#define DISPLAY_2 2
+#define DISPLAY_1 1
+#define DISPLAY_0 0
 
-const uint8_t display_bits[14] = {
+const uint8_t DISPLAY_BITS[14] = {
   0xFC, // 0
   0x60, // 1
   0xDA, // 2
