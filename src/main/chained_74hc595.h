@@ -24,6 +24,7 @@
 // Global Constants
 // --------------------------------------------------------------------------
 
+#define DISPLAY_DOT 14
 #define DISPLAY_FULL 13
 #define DISPLAY_EMPTY 12
 #define DISPLAY_DASH 11
@@ -39,7 +40,7 @@
 #define DISPLAY_1 1
 #define DISPLAY_0 0
 
-const uint8_t DISPLAY_BITS[14] = {
+const uint8_t DISPLAY_BITS[15] = {
   0xFC, // 0
   0x60, // 1
   0xDA, // 2
@@ -53,11 +54,12 @@ const uint8_t DISPLAY_BITS[14] = {
   0x9C, // C
   0x02, // -
   0x00, // empty
-  0xFF // full
+  0xFF, // full
+  0x01  // .
 };
 
 const uint16_t CYCLES_MICROSECONDS = 16;
-const uint16_t CYCLES_TRANSITION_DELAY = 16 ;
+const uint16_t CYCLES_TRANSITION_DELAY = 50 ;
 
 // --------------------------------------------------------------------------
 // Classes
@@ -127,7 +129,7 @@ Chained74HC595::Chained74HC595(
   digitalWrite(this->R_CLK, LOW);
 
   // Waits for a moment to make sure registers are clear.
-  this -> transitionDelay(CYCLES_MICROSECONDS * 2); 
+  this -> transitionDelay(CYCLES_MICROSECONDS * 20); 
 
   // Allows data enter the register now.
   digitalWrite(this->N_SR_CLR, HIGH);
@@ -152,8 +154,9 @@ void Chained74HC595::byteShift(uint8_t data){
 
     // Falling edge of Serial and Rising of Register clocks. 
     digitalWrite(this->SR_CLK, LOW);
+    this->transitionDelay(CYCLES_TRANSITION_DELAY/2);
     digitalWrite(this->R_CLK, HIGH);
-    this->transitionDelay(CYCLES_TRANSITION_DELAY);
+    this->transitionDelay(CYCLES_TRANSITION_DELAY/2);
 
     digitalWrite(this->R_CLK, LOW);
     this->transitionDelay(CYCLES_TRANSITION_DELAY);
