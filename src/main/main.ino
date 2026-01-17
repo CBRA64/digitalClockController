@@ -52,12 +52,12 @@ unsigned long
   SECOND_MS = 1000,                         // 1s
   TOGGLING_TIME_DURATION_MS = 4000,         // 4s
   TOGGLING_TEMPERATURE_DURATION_MS = 2000,  // 2s
-  RESYNC_LAPSE_MS = 120000,                 // 2h
+  RESYNC_LAPSE_MS = 1800,                   // 30min
   BLINK_INTERVAL_MS = 500                   // 0.5s
 ;
 
 // LIGHT INTENSITY
-uint8_t light_intensity = 128; // 0-255
+uint8_t light_intensity = 127; // 0-255
 
 
 
@@ -186,6 +186,10 @@ void updateLines(void){
 
   // SOLVED PROBLEM WITH DRIVERS
   if (lineA[0] & (1<<BIT_DISPLAY_E)){
+    lineA[0] &= 0xFF ^ (1<<BIT_DISPLAY_F);
+    lineA[0] += (1<<BIT_DISPLAY_F);
+  }
+  if (lineA[0] & (1<<BIT_DISPLAY_G)){
     lineA[0] += (1<<BIT_DISPLAY_H);
   }
   if (lineA[2] & (1<<BIT_DISPLAY_D)){
@@ -215,15 +219,16 @@ void updateLines(void){
     lineB[4] = DISPLAY_BITS[temp_int % 10];
     lineB[5] = DISPLAY_BITS[DISPLAY_C];
   } else{
-    int temp_hour  = hour%12;
-      if (temp_hour == 0) temp_hour = 12;
-    lineB[0] = DISPLAY_BITS[temp_hour/10 % 10];
+    int temp_hour = hour%12;
+    if (temp_hour == 0) temp_hour = 12;
+    if (temp_hour < 10) lineB[0] = DISPLAY_BITS[DISPLAY_EMPTY];
+    else lineB[0] = DISPLAY_BITS[DISPLAY_1];
     lineB[1] = DISPLAY_BITS[temp_hour % 10] + DISPLAY_BITS[DISPLAY_DOT];
 
-    lineB[2] = DISPLAY_BITS[minute/10 % 10] + DISPLAY_BITS[DISPLAY_DOT];
+    lineB[2] = DISPLAY_BITS[(minute/10) % 10] + DISPLAY_BITS[DISPLAY_DOT];
     lineB[3] = DISPLAY_BITS[minute % 10] + DISPLAY_BITS[DISPLAY_DOT];
 
-    lineB[4] = DISPLAY_BITS[second/10 % 10] + DISPLAY_BITS[DISPLAY_DOT];
+    lineB[4] = DISPLAY_BITS[(second/10) % 10] + DISPLAY_BITS[DISPLAY_DOT];
     lineB[5] = DISPLAY_BITS[second % 10];
   }
 
@@ -299,7 +304,7 @@ void loop(){
     blinked_time_ms = current_time_ms;
   }
   
-  // // Test display sequence A
+  // // // Test display sequence A
   // int delay_time = 100;
   // int pos = 7, len = 8;
   // for(unsigned char i = 0; i < len; i++){
