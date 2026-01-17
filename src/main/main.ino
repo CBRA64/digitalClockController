@@ -81,8 +81,8 @@ int16_t year, month, day, hour, minute, second;
 
 float temperature = 0.0;
 
-uint8_t lineA[6] = {DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH};
-uint8_t lineB[6] = {DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH};
+uint16_t lineA[6] = {DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH};
+uint16_t lineB[6] = {DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH};
 
 /*
   --------------------------------------------------------------------------
@@ -184,6 +184,22 @@ void updateLines(void){
   lineA[4] = DISPLAY_BITS[(day/10) % 10];
   lineA[5] = DISPLAY_BITS[day % 10];
 
+  // SOLVED PROBLEM WITH DRIVERS
+  if (lineA[0] & (1<<BIT_DISPLAY_E)){
+    lineA[0] += (1<<BIT_DISPLAY_H);
+  }
+  if (lineA[2] & (1<<BIT_DISPLAY_D)){
+    lineA[2] += (1<<BIT_DISPLAY_G);
+  }
+  if (lineA[4] & (1<<BIT_DISPLAY_F)){
+    lineA[4] += (1<<BIT_DISPLAY_H);
+  }
+  if (lineA[4] & (1<<BIT_DISPLAY_G)){
+    lineA[4] += (1<<BIT_DISPLAY_H);
+  }
+
+
+
   if (show_temperature){
     int temp_int = temperature * 10;
     lineB[0] = DISPLAY_BITS[DISPLAY_EMPTY];
@@ -252,65 +268,101 @@ void setup(){
 }
 
 void loop(){
-  // current_time_ms = millis();
-  // if (current_time_ms - resynced_time_ms >= RESYNC_LAPSE_MS){
-  //   syncTime();
-  //   resynced_time_ms = current_time_ms;
-  // }
+  current_time_ms = millis();
+  if (current_time_ms - resynced_time_ms >= RESYNC_LAPSE_MS){
+    syncTime();
+    resynced_time_ms = current_time_ms;
+  }
 
-  // if (show_temperature){
-  //   if (current_time_ms - toggled_time_ms >= TOGGLING_TEMPERATURE_DURATION_MS){
-  //     show_temperature = false;
-  //     toggled_time_ms = current_time_ms;
-  //   }
-  // } else {
-  //   current_time_ms = millis();
-  //   if (current_time_ms - toggled_time_ms >= TOGGLING_TIME_DURATION_MS){
-  //     show_temperature = getTemperature();
-  //     toggled_time_ms = current_time_ms;
-  //     tickTime(); 
-  //   } else {
-  //     if (current_time_ms - ticked_time_ms >= SECOND_MS){
-  //       tickTime();
-  //       ticked_time_ms = current_time_ms;
-  //     }
-  //   }
-  // }
+  if (show_temperature){
+    if (current_time_ms - toggled_time_ms >= TOGGLING_TEMPERATURE_DURATION_MS){
+      show_temperature = false;
+      toggled_time_ms = current_time_ms;
+    }
+  } else {
+    current_time_ms = millis();
+    if (current_time_ms - toggled_time_ms >= TOGGLING_TIME_DURATION_MS){
+      show_temperature = getTemperature();
+      toggled_time_ms = current_time_ms;
+      tickTime(); 
+    } else {
+      if (current_time_ms - ticked_time_ms >= SECOND_MS){
+        tickTime();
+        ticked_time_ms = current_time_ms;
+      }
+    }
+  }
 
-  // current_time_ms = millis();
-  // if (current_time_ms - blinked_time_ms >= BLINK_INTERVAL_MS){
-  //   digitalWrite(PIN_LED, !digitalRead(PIN_LED));
-  //   blinked_time_ms = current_time_ms;
-  // }
+  current_time_ms = millis();
+  if (current_time_ms - blinked_time_ms >= BLINK_INTERVAL_MS){
+    digitalWrite(PIN_LED, !digitalRead(PIN_LED));
+    blinked_time_ms = current_time_ms;
+  }
   
-  // // Test display sequence
-  // for(unsigned char i = 0; i < 10; i++){
-  //   chainA.byteShift(1<<(8-i));
-  //   chainB.byteShift(1<<(8-i));
+  // // Test display sequence A
+  // int delay_time = 100;
+  // int pos = 7, len = 8;
+  // for(unsigned char i = 0; i < len; i++){
+  //   chainA.byteShift(1<<(pos-i));
+  //   chainB.byteShift(1<<(pos-i));
   //   chainA.enableOutput();
   //   chainB.enableOutput();
   //   digitalWrite(PIN_LED, HIGH);
-  //   delay(50);
+  //   delay(delay_time);
   //   chainA.disableOutput();
   //   chainB.disableOutput();
   //   digitalWrite(PIN_LED, LOW);
-  //   delay(50);
+  //   delay(1);
 
   // }
 
-  // Test full and empty display
-  chainA.disableOutput();
-  chainB.disableOutput();
-  chainA.byteShift(DISPLAY_BITS[DISPLAY_EMPTY]);
-  chainB.byteShift(DISPLAY_BITS[DISPLAY_EMPTY]);
-  chainA.enableOutput();
-  chainB.enableOutput();
-  delay(100);
-  chainA.disableOutput();
-  chainB.disableOutput();
-  chainA.byteShift(DISPLAY_BITS[DISPLAY_FULL]);
-  chainB.byteShift(DISPLAY_BITS[DISPLAY_FULL]);
-  chainA.enableOutput();
-  chainB.enableOutput();
-  delay(100);
+  
+  // // Test display sequence B
+  // int delay_time = 1000;
+  // for(unsigned char i = 0; i < 15; i++){
+  //   chainA.byteShift(DISPLAY_BITS[i]);
+  //   chainB.byteShift(DISPLAY_BITS[i]);
+  //   chainA.enableOutput();
+  //   chainB.enableOutput();
+  //   digitalWrite(PIN_LED, HIGH);
+  //   delay(delay_time);
+  //   chainA.disableOutput();
+  //   chainB.disableOutput();
+  //   digitalWrite(PIN_LED, LOW);
+  //   delay(10);
+
+  // }
+
+  // // Test display sequence C
+  // int delay_time = 100;
+  // int pos = 7, len = 1;
+  // for(unsigned char i = 0; i < len; i++){
+  //   chainA.byteShift(DISPLAY_BITS[BIT_DISPLAY_A]);
+  //   chainB.byteShift(DISPLAY_BITS[BIT_DISPLAY_A]);
+  //   chainA.enableOutput();
+  //   chainB.enableOutput();
+  //   digitalWrite(PIN_LED, HIGH);
+  //   delay(delay_time);
+  //   chainA.disableOutput();
+  //   chainB.disableOutput();
+  //   digitalWrite(PIN_LED, LOW);
+  //   delay(1);
+
+  // }
+
+  // // Test full and empty display
+  // chainA.disableOutput();
+  // chainB.disableOutput();
+  // chainA.byteShift(DISPLAY_BITS[DISPLAY_EMPTY]);
+  // chainB.byteShift(DISPLAY_BITS[DISPLAY_EMPTY]);
+  // chainA.enableOutput();
+  // chainB.enableOutput();
+  // delay(100);
+  // chainA.disableOutput();
+  // chainB.disableOutput();
+  // chainA.byteShift(DISPLAY_BITS[DISPLAY_FULL]);
+  // chainB.byteShift(DISPLAY_BITS[DISPLAY_FULL]);
+  // chainA.enableOutput();
+  // chainB.enableOutput();
+  // delay(100);
 }

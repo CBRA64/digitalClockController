@@ -40,6 +40,15 @@
 #define DISPLAY_1 1
 #define DISPLAY_0 0
 
+#define BIT_DISPLAY_A 7
+#define BIT_DISPLAY_B 6
+#define BIT_DISPLAY_C 5
+#define BIT_DISPLAY_D 4
+#define BIT_DISPLAY_E 3
+#define BIT_DISPLAY_F 2
+#define BIT_DISPLAY_G 1
+#define BIT_DISPLAY_H 0
+
 const uint8_t DISPLAY_BITS[15] = {
   0xFC, // 0
   0x60, // 1
