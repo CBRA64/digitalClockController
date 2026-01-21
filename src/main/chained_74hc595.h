@@ -23,52 +23,8 @@
 // --------------------------------------------------------------------------
 // Global Constants
 // --------------------------------------------------------------------------
-
-#define DISPLAY_DOT 14
-#define DISPLAY_FULL 13
-#define DISPLAY_EMPTY 12
-#define DISPLAY_DASH 11
-#define DISPLAY_C 10
-#define DISPLAY_9 9
-#define DISPLAY_8 8
-#define DISPLAY_7 7
-#define DISPLAY_6 6
-#define DISPLAY_5 5
-#define DISPLAY_4 4
-#define DISPLAY_3 3
-#define DISPLAY_2 2
-#define DISPLAY_1 1
-#define DISPLAY_0 0
-
-#define BIT_DISPLAY_A 7
-#define BIT_DISPLAY_B 6
-#define BIT_DISPLAY_C 5
-#define BIT_DISPLAY_D 4
-#define BIT_DISPLAY_E 3
-#define BIT_DISPLAY_F 2
-#define BIT_DISPLAY_G 1
-#define BIT_DISPLAY_H 0
-
-const uint8_t DISPLAY_BITS[15] = {
-  0xFC, // 0
-  0x60, // 1
-  0xDA, // 2
-  0xF2, // 3
-  0x66, // 4
-  0xB6, // 5
-  0xBE, // 6
-  0xE0, // 7
-  0xFE, // 8
-  0xF6, // 9
-  0x9C, // C
-  0x02, // -
-  0x00, // empty
-  0xFF, // full
-  0x01  // .
-};
-
 const uint16_t CYCLES_MICROSECONDS = 16;
-const uint16_t CYCLES_TRANSITION_DELAY = 50 ;
+const uint16_t CYCLES_TRANSITION_DELAY = 4 ;
 
 // --------------------------------------------------------------------------
 // Classes
@@ -146,6 +102,7 @@ Chained74HC595::Chained74HC595(
 
 
 void Chained74HC595::transitionDelay(uint16_t cycles){
+  // HARDWARE DEPENDANT !!! 
   for (uint16_t i = 0; i < cycles; i++){
     __asm__("nop");
   }
@@ -153,7 +110,7 @@ void Chained74HC595::transitionDelay(uint16_t cycles){
 
 void Chained74HC595::byteShift(uint8_t data){
   for (uint8_t bit = 0; bit < 8; bit++){
-    // Write bit data.
+    // Writes bit data.
     digitalWrite(this->SER, data & (1<<bit));
     this->transitionDelay(CYCLES_TRANSITION_DELAY);
 
@@ -163,10 +120,10 @@ void Chained74HC595::byteShift(uint8_t data){
 
     // Falling edge of Serial and Rising of Register clocks. 
     digitalWrite(this->SR_CLK, LOW);
-    this->transitionDelay(CYCLES_TRANSITION_DELAY/2);
+    this->transitionDelay(CYCLES_TRANSITION_DELAY);
     digitalWrite(this->R_CLK, HIGH);
-    this->transitionDelay(CYCLES_TRANSITION_DELAY/2);
 
+    // Falling edge of Register clocks
     digitalWrite(this->R_CLK, LOW);
     this->transitionDelay(CYCLES_TRANSITION_DELAY);
   }

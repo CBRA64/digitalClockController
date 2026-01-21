@@ -57,7 +57,52 @@ unsigned long
 ;
 
 // LIGHT INTENSITY
-uint8_t light_intensity = 127; // 0-255
+uint8_t light_intensity = 200; // 0-255
+
+// DISPLAY CHARACTERS CONVERSION
+#define DISPLAY_DOT 14
+#define DISPLAY_FULL 13
+#define DISPLAY_EMPTY 12
+#define DISPLAY_DASH 11
+#define DISPLAY_C 10
+#define DISPLAY_9 9
+#define DISPLAY_8 8
+#define DISPLAY_7 7
+#define DISPLAY_6 6
+#define DISPLAY_5 5
+#define DISPLAY_4 4
+#define DISPLAY_3 3
+#define DISPLAY_2 2
+#define DISPLAY_1 1
+#define DISPLAY_0 0
+
+const uint16_t DISPLAY_BITS[15] = {
+  0xFC, // 0
+  0x60, // 1
+  0xDA, // 2
+  0xF2, // 3
+  0x66, // 4
+  0xB6, // 5
+  0xBE, // 6
+  0xE0, // 7
+  0xFE, // 8
+  0xF6, // 9
+  0x9C, // C
+  0x02, // -
+  0x00, // empty
+  0xFF, // full
+  0x01  // .
+};
+
+// BIT SEGMENT POSITION
+#define BIT_SEGMENT_A 7
+#define BIT_SEGMENT_B 6
+#define BIT_SEGMENT_C 5
+#define BIT_SEGMENT_D 4
+#define BIT_SEGMENT_E 3
+#define BIT_SEGMENT_F 2
+#define BIT_SEGMENT_G 1
+#define BIT_SEGMENT_H 0
 
 
 
@@ -185,21 +230,21 @@ void updateLines(void){
   lineA[5] = DISPLAY_BITS[day % 10];
 
   // SOLVED PROBLEM WITH DRIVERS
-  if (lineA[0] & (1<<BIT_DISPLAY_E)){
-    lineA[0] &= 0xFF ^ (1<<BIT_DISPLAY_F);
-    lineA[0] += (1<<BIT_DISPLAY_F);
+  if (lineA[0] & (1<<BIT_SEGMENT_E)){
+    lineA[0] &= 0xFF ^ (1<<BIT_SEGMENT_F);
+    lineA[0] += (1<<BIT_SEGMENT_F);
   }
-  if (lineA[0] & (1<<BIT_DISPLAY_G)){
-    lineA[0] += (1<<BIT_DISPLAY_H);
+  if (lineA[0] & (1<<BIT_SEGMENT_G)){
+    lineA[0] += (1<<BIT_SEGMENT_H);
   }
-  if (lineA[2] & (1<<BIT_DISPLAY_D)){
-    lineA[2] += (1<<BIT_DISPLAY_G);
+  if (lineA[2] & (1<<BIT_SEGMENT_D)){
+    lineA[2] += (1<<BIT_SEGMENT_G);
   }
-  if (lineA[4] & (1<<BIT_DISPLAY_F)){
-    lineA[4] += (1<<BIT_DISPLAY_H);
+  if (lineA[4] & (1<<BIT_SEGMENT_F)){
+    lineA[4] += (1<<BIT_SEGMENT_H);
   }
-  if (lineA[4] & (1<<BIT_DISPLAY_G)){
-    lineA[4] += (1<<BIT_DISPLAY_H);
+  if (lineA[4] & (1<<BIT_SEGMENT_G)){
+    lineA[4] += (1<<BIT_SEGMENT_H);
   }
 
 
@@ -303,71 +348,4 @@ void loop(){
     digitalWrite(PIN_LED, !digitalRead(PIN_LED));
     blinked_time_ms = current_time_ms;
   }
-  
-  // // // Test display sequence A
-  // int delay_time = 100;
-  // int pos = 7, len = 8;
-  // for(unsigned char i = 0; i < len; i++){
-  //   chainA.byteShift(1<<(pos-i));
-  //   chainB.byteShift(1<<(pos-i));
-  //   chainA.enableOutput();
-  //   chainB.enableOutput();
-  //   digitalWrite(PIN_LED, HIGH);
-  //   delay(delay_time);
-  //   chainA.disableOutput();
-  //   chainB.disableOutput();
-  //   digitalWrite(PIN_LED, LOW);
-  //   delay(1);
-
-  // }
-
-  
-  // // Test display sequence B
-  // int delay_time = 1000;
-  // for(unsigned char i = 0; i < 15; i++){
-  //   chainA.byteShift(DISPLAY_BITS[i]);
-  //   chainB.byteShift(DISPLAY_BITS[i]);
-  //   chainA.enableOutput();
-  //   chainB.enableOutput();
-  //   digitalWrite(PIN_LED, HIGH);
-  //   delay(delay_time);
-  //   chainA.disableOutput();
-  //   chainB.disableOutput();
-  //   digitalWrite(PIN_LED, LOW);
-  //   delay(10);
-
-  // }
-
-  // // Test display sequence C
-  // int delay_time = 100;
-  // int pos = 7, len = 1;
-  // for(unsigned char i = 0; i < len; i++){
-  //   chainA.byteShift(DISPLAY_BITS[BIT_DISPLAY_A]);
-  //   chainB.byteShift(DISPLAY_BITS[BIT_DISPLAY_A]);
-  //   chainA.enableOutput();
-  //   chainB.enableOutput();
-  //   digitalWrite(PIN_LED, HIGH);
-  //   delay(delay_time);
-  //   chainA.disableOutput();
-  //   chainB.disableOutput();
-  //   digitalWrite(PIN_LED, LOW);
-  //   delay(1);
-
-  // }
-
-  // // Test full and empty display
-  // chainA.disableOutput();
-  // chainB.disableOutput();
-  // chainA.byteShift(DISPLAY_BITS[DISPLAY_EMPTY]);
-  // chainB.byteShift(DISPLAY_BITS[DISPLAY_EMPTY]);
-  // chainA.enableOutput();
-  // chainB.enableOutput();
-  // delay(100);
-  // chainA.disableOutput();
-  // chainB.disableOutput();
-  // chainA.byteShift(DISPLAY_BITS[DISPLAY_FULL]);
-  // chainB.byteShift(DISPLAY_BITS[DISPLAY_FULL]);
-  // chainA.enableOutput();
-  // chainB.enableOutput();
-  // delay(100);
 }
