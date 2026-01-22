@@ -27,17 +27,17 @@
 
 // Pinout declarations
 const uint8_t
-  CHAIN_A_N_SR_CLR = 12,  // ICC N_SR_CLR pin 10  // Unclears Serial
-  CHAIN_A_N_OE = 11,      // ICC N_OE pin 13      // Disables Output
-  CHAIN_A_SR_CLK = 10,    // ICC SR_CLK pin 11    // Reads Serial
-  CHAIN_A_R_CLK = 9,      // ICC R_CLK pin 12     // Shifts Serial
-  CHAIN_A_SER = 8,        // ICC SER pin 14       // Data Serial
+  CHAIN_B_N_SR_CLR = 12,  // ICC N_SR_CLR pin 10  // Unclears Serial
+  CHAIN_B_N_OE = 11,      // ICC N_OE pin 13      // Disables Output
+  CHAIN_B_SR_CLK = 10,    // ICC SR_CLK pin 11    // Reads Serial
+  CHAIN_B_R_CLK = 9,      // ICC R_CLK pin 12     // Shifts Serial
+  CHAIN_B_SER = 8,        // ICC SER pin 14       // Data Serial
   
-  CHAIN_B_N_SR_CLR = 7,   // ICC N_SR_CLR pin 10  // Unclears Serial
-  CHAIN_B_N_OE = 6,       // ICC N_OE pin 13      // Disables Output
-  CHAIN_B_SR_CLK = 5,     // ICC SR_CLK pin 11    // Reads Serial
-  CHAIN_B_R_CLK = 4,      // ICC R_CLK pin 12     // Shifts Serial
-  CHAIN_B_SER = 3,        // ICC SER pin 14       // Data Serial
+  CHAIN_A_N_SR_CLR = 7,   // ICC N_SR_CLR pin 10  // Unclears Serial
+  CHAIN_A_N_OE = 6,       // ICC N_OE pin 13      // Disables Output
+  CHAIN_A_SR_CLK = 5,     // ICC SR_CLK pin 11    // Reads Serial
+  CHAIN_A_R_CLK = 4,      // ICC R_CLK pin 12     // Shifts Serial
+  CHAIN_A_SER = 3,        // ICC SER pin 14       // Data Serial
 
   PIN_LED = 13,           // On-board LED pin
 
@@ -53,7 +53,7 @@ unsigned long
   TOGGLING_TIME_DURATION_MS = 4000,         // 4s
   TOGGLING_TEMPERATURE_DURATION_MS = 2000,  // 2s
   RESYNC_LAPSE_MS = 1800,                   // 30min
-  BLINK_INTERVAL_MS = 500                   // 0.5s
+  BLINK_INTERVAL_MS = 250                   // 0.5s
 ;
 
 // LIGHT INTENSITY
@@ -229,26 +229,6 @@ void updateLines(void){
   lineA[4] = DISPLAY_BITS[(day/10) % 10];
   lineA[5] = DISPLAY_BITS[day % 10];
 
-  // SOLVED PROBLEM WITH DRIVERS
-  if (lineA[0] & (1<<BIT_SEGMENT_E)){
-    lineA[0] &= 0xFF ^ (1<<BIT_SEGMENT_F);
-    lineA[0] += (1<<BIT_SEGMENT_F);
-  }
-  if (lineA[0] & (1<<BIT_SEGMENT_G)){
-    lineA[0] += (1<<BIT_SEGMENT_H);
-  }
-  if (lineA[2] & (1<<BIT_SEGMENT_D)){
-    lineA[2] += (1<<BIT_SEGMENT_G);
-  }
-  if (lineA[4] & (1<<BIT_SEGMENT_F)){
-    lineA[4] += (1<<BIT_SEGMENT_H);
-  }
-  if (lineA[4] & (1<<BIT_SEGMENT_G)){
-    lineA[4] += (1<<BIT_SEGMENT_H);
-  }
-
-
-
   if (show_temperature){
     int temp_int = temperature * 10;
     lineB[0] = DISPLAY_BITS[DISPLAY_EMPTY];
@@ -275,6 +255,24 @@ void updateLines(void){
 
     lineB[4] = DISPLAY_BITS[(second/10) % 10] + DISPLAY_BITS[DISPLAY_DOT];
     lineB[5] = DISPLAY_BITS[second % 10];
+  }
+
+  // SOLVED PROBLEM WITH DRIVERS
+  if (lineA[0] & (1<<BIT_SEGMENT_E)){
+    lineA[0] &= 0xFF ^ (1<<BIT_SEGMENT_F);
+    lineA[0] += (1<<BIT_SEGMENT_F);
+  }
+  if (lineA[0] & (1<<BIT_SEGMENT_G)){
+    lineA[0] += (1<<BIT_SEGMENT_H);
+  }
+  if (lineA[2] & (1<<BIT_SEGMENT_D)){
+    lineA[2] += (1<<BIT_SEGMENT_G);
+  }
+  if (lineA[4] & (1<<BIT_SEGMENT_F)){
+    lineA[4] += (1<<BIT_SEGMENT_H);
+  }
+  if (lineA[4] & (1<<BIT_SEGMENT_G)){
+    lineB[5] += (1<<BIT_SEGMENT_H);
   }
 
   digitalWrite(CHAIN_A_N_OE, HIGH); // Indicate updating display
