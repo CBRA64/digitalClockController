@@ -5,13 +5,13 @@
  * This file contains the main source for the control of a digital clock using
  * as the base an arduino nano.
  * 
- * @version 0.0.1+202601140057UTC
- * @date 2025-10-30 15:55 UTC
+ * @version 1.0.0
+ * @date 2026-01-22 13:40 UTC
  * @author CBRA64
  * @copyright MIT License
  * @details
  * - Created: 2025-10-30 15:55 UTC
- * - Last modified: 2026-01-14 00:57 UTC
+ * - Last modified: 2026-01-22 13:40 UTC
  * - Repository: https://github.com/CBRA64/digitalClockController.git
 */
 
@@ -53,7 +53,7 @@ unsigned long
   TOGGLING_TIME_DURATION_MS = 4000,         // 4s
   TOGGLING_TEMPERATURE_DURATION_MS = 2000,  // 2s
   RESYNC_LAPSE_MS = 1800,                   // 30min
-  BLINK_INTERVAL_MS = 250                   // 0.5s
+  BLINK_INTERVAL_MS = 400                   // 0.5s
 ;
 
 // LIGHT INTENSITY

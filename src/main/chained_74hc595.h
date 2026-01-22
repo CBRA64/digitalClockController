@@ -7,13 +7,13 @@
  * Based on the datasheet information from: 
  * https://www.ti.com/lit/ds/symlink/sn74hc595.pdf
  * 
- * @version 0.0.1+202601140057UTC
- * @date 2025-10-30 15:55 UTC
+ * @version 1.0.0
+ * @date 2026-01-22 13:40 UTC
  * @author CBRA64
  * @copyright MIT License
  * @details
  * - Created: 2025-10-30 13:11 UTC
- * - Last modified: 2026-01-14 00:57 UTC
+ * - Last modified: 2026-01-22 13:40 UTC
  * - Repository: https://github.com/CBRA64/digitalClockController.git
 */
 
