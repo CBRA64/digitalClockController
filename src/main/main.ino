@@ -5,7 +5,7 @@
  * This file contains the main source for the control of a digital clock using
  * as the base an arduino nano.
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026-01-22 13:40 UTC
  * @author CBRA64
  * @copyright MIT License
@@ -292,10 +292,16 @@ void updateData(void){
       DISPLAY_BITS[temp_hour % 10] | 
       (blink_state & DISPLAY_BITS[DISPLAY_DOT]);
 
-    lineB[2] = DISPLAY_BITS[(minute/10) % 10] + DISPLAY_BITS[DISPLAY_DOT];
-    lineB[3] = DISPLAY_BITS[minute % 10] + DISPLAY_BITS[DISPLAY_DOT];
+    lineB[2] = 
+      DISPLAY_BITS[(minute/10) % 10] | 
+      (blink_state & DISPLAY_BITS[DISPLAY_DOT]);
+    lineB[3] = 
+      DISPLAY_BITS[minute % 10] | 
+      (blink_state & DISPLAY_BITS[DISPLAY_DOT]);
 
-    lineB[4] = DISPLAY_BITS[(second/10) % 10] + DISPLAY_BITS[DISPLAY_DOT];
+    lineB[4] = 
+      DISPLAY_BITS[(second/10) % 10] | 
+      (blink_state & DISPLAY_BITS[DISPLAY_DOT]);
     lineB[5] = DISPLAY_BITS[second % 10];
   }
 
