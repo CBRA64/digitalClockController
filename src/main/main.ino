@@ -17,7 +17,9 @@
 
 #include "chained_74hc595.h"
 #include "RTClib.h"
-#include "DHT.h"
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
 
 /*
   --------------------------------------------------------------------------
@@ -52,7 +54,7 @@ unsigned long
   TOGGLING_TIME_DURATION_MS = 4000,         // 4s
   TOGGLING_TEMPERATURE_DURATION_MS = 2000,  // 2s
   RESYNC_LAPSE_MS = 1800,                   // 30min
-  BLINK_INTERVAL_MS = 400                   // 0.5s
+  BLINK_INTERVAL_MS = 400                   // 0.4s
 ;
 
 // LIGHT INTENSITY
@@ -156,7 +158,7 @@ chainB(
 RTC_DS1307 rtc;
 
 // Thermometer module
-DHT dht(PIN_DHT, DHTTYPE);
+DHT_Unified dht(PIN_DHT, DHTTYPE);
 
 
 
@@ -218,7 +220,9 @@ void tickTime(void){
 
 
 bool getTemperature(void){
-  temperature = dht.readTemperature();
+  sensors_event_t event;
+  dht.temperature().getEvent(&event);
+  temperature = event.temperature;
 
   if (isnan(temperature)) {
     #if DEBUG
