@@ -5,13 +5,13 @@
  * This file contains the main source for the control of a digital clock using
  * as the base an arduino nano.
  * 
- * @version 1.1.0
+ * @version 1.1.1
  * @date 2026-01-22 13:40 UTC
  * @author CBRA64
  * @copyright MIT License
  * @details
  * - Created: 2025-10-30 15:55 UTC
- * - Last modified: 2026-01-22 13:40 UTC
+ * - Last modified: 2026-03-10 12:46 UTC
  * - Repository: https://github.com/CBRA64/digitalClockController.git
 */
 
