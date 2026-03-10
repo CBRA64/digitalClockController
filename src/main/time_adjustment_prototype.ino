@@ -8,7 +8,12 @@ unsigned long command_started_time_ms = 0;
 // unsigned long current_time_ms = 0;
 
 void commandHandler(){
-
+  // SET DATE
+  // "%SXXXX,XX,XX,XX,XX,XX"
+  // INCREMENT TIME
+  // "%I" + string of time to increment
+  // DECREMENT TIME
+  // "%D" + string of time to decrement
 }
 
 void setup_prototype(){
@@ -44,14 +49,5 @@ void serialEvent(){
         commandHandler();
       } 
     }
-
-
-    // // RX_COMMAND_BUFFER[POSITION_RX_COMMAND_CURRENT] = RXChar;
-    // if (inChar == '\n') {
-    //   stringComplete = true;
-    //   break;
-    // } else {
-    //   inputString += inChar;
-    // }
   }
 }
