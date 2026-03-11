@@ -3,7 +3,7 @@
 RTC_DS1307 rtc;
 
 // Time duration of the compiling and programming process in seconds. 
-int32_t buffer_time_s = 5;
+int32_t buffer_time_s = 8;
 
 void setup() {
   Serial.begin(115200);

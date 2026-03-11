@@ -5,13 +5,13 @@
  * This file contains the main source for the control of a digital clock using
  * as the base an arduino nano.
  * 
- * @version 1.1.1
- * @date 2026-01-22 13:40 UTC
+ * @version 1.2.0
+ * @date 2026-03-11 05:00 UTC
  * @author CBRA64
  * @copyright MIT License
  * @details
  * - Created: 2025-10-30 15:55 UTC
- * - Last modified: 2026-03-10 12:46 UTC
+ * - Last modified: 2026-03-11 05:00 UTC
  * - Repository: https://github.com/CBRA64/digitalClockController.git
 */
 
@@ -53,9 +53,11 @@ unsigned long
   SECOND_MS = 1000,                         // 1s
   TOGGLING_TIME_DURATION_MS = 4000,         // 4s
   TOGGLING_TEMPERATURE_DURATION_MS = 2000,  // 2s
-  RESYNC_LAPSE_MS = 1800,                   // 30min
-  BLINK_INTERVAL_MS = 400                   // 0.4s
+  RESYNC_LAPSE_MS = 3600000,                // 1h
+  BLINK_INTERVAL_MS = 400,                  // 0.4s
+  COMMAND_RECEIVING_LAPSE_MS = 3000         // 3s
 ;
+const uint8_t COMMAND_BUFFER_SIZE = 64;
 
 // LIGHT INTENSITY
 uint8_t light_intensity = 200; // 0-255
@@ -134,8 +136,15 @@ uint16_t
   toggled_time_ms = 0,
   resynced_time_ms = 0,
   ticked_time_ms = 0,
-  blinked_time_ms = 0
+  blinked_time_ms = 0,
+  command_started_time_ms = 0
 ;
+
+// Command time control variables
+uint8_t command_buffer_position = 0;
+char COMMAND_BUFFER[COMMAND_BUFFER_SIZE];
+bool command_started = false;
+
 
 /*
   --------------------------------------------------------------------------
@@ -167,6 +176,8 @@ DHT_Unified dht(PIN_DHT, DHTTYPE);
   Functions Declarations
   --------------------------------------------------------------------------
 */
+void commandHandler(void); // Handles time adjustment commands received from serial.
+void serial_event(void); // Works with the received serial data.
 void syncTime(void); // Fetches time from the rtc module.
 void tickTime(void); // Increases time value by a second.
 bool getTemperature(void); // Fetches temperature from sensor if possible.
@@ -182,6 +193,67 @@ void loop(void); // Looping function.
   Functions Definitions
   --------------------------------------------------------------------------
 */
+void commandHandler(void){
+  // INCREMENT TIME
+  // "%I" + string of time to increment
+  // DECREMENT TIME
+  // "%D" + string of time to decrement
+  String cmd_data = "";
+  for(uint8_t i = 2; i < COMMAND_BUFFER_SIZE; i++){
+    if (COMMAND_BUFFER[i] == 0){
+      break;
+    } 
+    cmd_data += COMMAND_BUFFER[i];
+  } 
+
+  int32_t delta_time = cmd_data.toInt();
+  
+  if (COMMAND_BUFFER[1] == 'I'){
+    DateTime time = rtc.now();
+    rtc.adjust(time + TimeSpan(delta_time));
+    syncTime();
+    #if DEBUG
+        Serial.print("Incremented time by: ");
+        Serial.print(delta_time);
+        Serial.println(" seconds.");
+    # endif
+  } else if (COMMAND_BUFFER[1] == 'D'){
+    DateTime time = rtc.now();
+    rtc.adjust(time - TimeSpan(delta_time));
+    syncTime();
+    #if DEBUG
+        Serial.print("Decremented time by: ");
+        Serial.print(delta_time);
+        Serial.println(" seconds.");
+    # endif
+  } 
+}
+
+void serial_event(){
+  char RXChar;
+  while (Serial.available() > 0) {
+    RXChar = Serial.read();
+    if(RXChar == '\n' || RXChar == '%' || isAlphaNumeric(RXChar)){
+      if (RXChar == '%'){
+        command_started = true;
+        command_buffer_position = 0;
+        delay(1); // For some reason that I don't know yet this is necessary.
+      }
+      if (command_started){
+        COMMAND_BUFFER[command_buffer_position++] = RXChar;
+        if (command_buffer_position >= (COMMAND_BUFFER_SIZE-1)){
+          command_started = false;
+        }
+        if (RXChar == '\n'){
+          command_started = false;
+          commandHandler();
+          command_buffer_position = 0;
+        }
+      }
+    }
+  }
+}
+
 void syncTime(void){
   DateTime now = rtc.now();
 
@@ -252,7 +324,7 @@ void solveDriverFailures(void){
   rerouteSeg(lineA_temp[0], lineA[0], BIT_SEGMENT_E, BIT_SEGMENT_F);
   rerouteSeg(lineA_temp[0], lineA[0], BIT_SEGMENT_G, BIT_SEGMENT_H);
   rerouteSeg(lineA_temp[2], lineA[2], BIT_SEGMENT_D, BIT_SEGMENT_G);
-  rerouteSeg(lineA_temp[4], lineA[4], BIT_SEGMENT_F, BIT_SEGMENT_H);
+  rerouteSeg(lineA_temp[4], lineB[0], BIT_SEGMENT_F, BIT_SEGMENT_D);
   rerouteSeg(lineA_temp[4], lineB[5], BIT_SEGMENT_G, BIT_SEGMENT_H);
 }
 
@@ -397,5 +469,11 @@ void loop(void){
     digitalWrite(PIN_LED, blink_state);
     blinked_time_ms = current_time_ms;
   }
-
+  if(command_started){
+    current_time_ms = millis();
+    if(current_time_ms - command_started_time_ms >= COMMAND_RECEIVING_LAPSE_MS){
+      command_started = false;
+    }
+  }
+  serial_event();
 }
